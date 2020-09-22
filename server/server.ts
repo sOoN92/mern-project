@@ -5,9 +5,12 @@ import mongoose from 'mongoose';
 import User from './models/user';
 import jwt from 'jsonwebtoken';
 
+// init webserver
+import './websocket';
+import { JWT_SECRET_TOKEN } from './utilities';
+
 const app = express();
 
-const JWT_SECRET_TOKEN = 'fsdjfnjògjdfgjdfò^^????1gkjòkldfgjò$%&1231233___!!!dfkjgkldfjgklògjdklfg';
 
 mongoose.connect('mongodb://localhost:27017/codedamn-live');
 
