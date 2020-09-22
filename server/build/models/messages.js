@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const MessageModel = new mongoose_1.default.Schema({
-    email: { type: String, required: true, unique: true },
+    email: { type: String, required: true },
     message: { type: String, required: true },
     date: { type: Number, required: true }
 }, { collection: 'messages' });

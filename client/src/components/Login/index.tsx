@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import { Button, TextField } from "@material-ui/core";
 import "./style.css";
+import { useHistory } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const history = useHistory();
 
   async function loginUser() {
     const res = await fetch("http://localhost:1337/api/login", {
@@ -20,7 +23,8 @@ export default function Login() {
 
     if (res.status === 'ok') {
       localStorage.setItem('token', res.data);
-      alert('You are logged in')
+      alert('You are logged in');
+      history.push('/chat');
     } else {
       alert(res.error);
     }

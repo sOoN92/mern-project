@@ -1,46 +1,33 @@
 import WebSocket from 'ws';
 import { processMessage, CustomWebSocket, JWT_SECRET_TOKEN } from './utilities';
-import Message from './models/messages';
 import http from 'http';
 import jwt from 'jsonwebtoken';
+import { broadcastMessage, clients, setClients, retrieveAndSendMessage } from './wsfunc';
 
 const server = http.createServer();
 const wss = new WebSocket.Server({ noServer: true });
 
-let clients: CustomWebSocket[] = [];
-const date = new Date();
 
 wss.on('connection', function connection(ws: CustomWebSocket) {
     // a single client has joined
     clients.push(ws);
 
     ws.on('close', () => {
-        clients = clients.filter(genWs => genWs.connectionID !== ws.connectionID);
+        setClients(clients.filter(genWs => genWs.connectionID !== ws.connectionID));
     });
 
     ws.on('message', function incoming(payload) {
         const message = processMessage(payload.toString());
-        if (!message || message.intent !== 'chat') {
+        if (!message) {
             return;
         }
 
-        const newMessage = new Message({
-            email: 'nicola@moramarco.com',
-            message: message.message,
-            date: Date.now()
-        });
-
-        newMessage.save(); // queue the task in bg
-
-        // broadcast to all clients
-        for (let index = 0; index < clients.length; index++) {
-            const client = clients[index];
-            client.send(JSON.stringify({
-                message: message.message,
-                user: ws.connectionID,
-                intent: 'chat',
-                date
-            }));
+        if (message.intent === 'chat') {
+            broadcastMessage(message, ws);
+        } else if (message.intent === 'old-messages') {
+            const count = message.count;
+            if (!count) return;
+            retrieveAndSendMessage(ws, count);
         }
     });
 });
